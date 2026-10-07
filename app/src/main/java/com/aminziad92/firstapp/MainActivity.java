@@ -6,7 +6,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-/** Shows the quiz game (app/src/main/assets/index.html) full screen. Works offline. */
+/** Shows the games hub (app/src/main/assets/index.html) full screen. Works offline. */
 public class MainActivity extends Activity {
 
     private WebView web;
@@ -37,10 +37,13 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (web.canGoBack()) {
-            web.goBack();
-        } else {
-            super.onBackPressed();
-        }
+        web.evaluateJavascript("(window.appBack && window.appBack()) ? '1' : '0'", new android.webkit.ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String value) {
+                if (value == null || !value.contains("1")) {
+                    finish();
+                }
+            }
+        });
     }
 }

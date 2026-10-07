@@ -3,84 +3,434 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>تحدي المعرفة</title>
+<title>ركن الألعاب</title>
 <style>
 :root {
-  --bg: #f3f6f6;
-  --surface: #ffffff;
-  --ink: #14262b;
-  --muted: #587076;
-  --line: #d5e0e1;
-  --accent: #0b7f7b;
-  --accent-ink: #ffffff;
-  --good: #1b7f3a;
-  --good-bg: #e0f3e6;
-  --bad: #b3261e;
-  --bad-bg: #fbe4e2;
+  --bg: #f3f6f6; --surface: #ffffff; --ink: #14262b; --muted: #587076; --line: #d5e0e1;
+  --accent: #0b7f7b; --accent-ink: #ffffff; --p1: #0b7f7b; --p2: #c2410c;
+  --good: #1b7f3a; --good-bg: #e0f3e6; --bad: #b3261e; --bad-bg: #fbe4e2;
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", "Noto Naskh Arabic", Tahoma, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0f1a1c; --surface: #172a2d; --ink: #e7f1f1; --muted: #9db6b9; --line: #2a4448;
-    --accent: #4fd6cf; --accent-ink: #0f1a1c;
+    --accent: #4fd6cf; --accent-ink: #0f1a1c; --p1: #4fd6cf; --p2: #ffa36b;
     --good: #7be39a; --good-bg: #17402a; --bad: #ff9a92; --bad-bg: #4a1f1c;
   }
 }
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; min-height: 100%; }
-body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 18px; line-height: 1.7; padding: 20px 16px 32px; }
-main { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
-h1 { font-size: 34px; line-height: 1.2; margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 18px; line-height: 1.6; padding: 16px 14px 28px; }
+main { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+h1 { font-size: 32px; line-height: 1.2; margin: 0; }
+h2 { font-size: 24px; line-height: 1.3; margin: 0; }
 p { margin: 0; }
-.muted { color: var(--muted); font-size: 16px; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-.bar { display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: var(--muted); }
-.track { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
-.fill { height: 100%; background: var(--accent); width: 0; transition: width .25s; }
-.q { font-size: 22px; font-weight: 700; line-height: 1.5; }
-.opts { display: flex; flex-direction: column; gap: 10px; }
 button { font: inherit; cursor: pointer; }
-.opt { text-align: right; color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.muted { color: var(--muted); font-size: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.primary { color: var(--accent-ink); background: var(--accent); border: 0; border-radius: 12px; padding: 13px 18px; font-weight: 700; font-size: 18px; }
+.ghost { color: var(--ink); background: transparent; border: 2px solid var(--line); border-radius: 12px; padding: 11px 16px; font-size: 17px; }
+.primary:disabled, .ghost:disabled { opacity: .45; }
+.row { display: flex; gap: 10px; }
+.row > * { flex: 1; }
+.hide { display: none !important; }
+.menu-btn { text-align: right; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; gap: 14px; align-items: center; }
+.menu-btn:active { border-color: var(--accent); }
+.menu-btn .ic { font-size: 40px; line-height: 1; }
+.menu-btn b { display: block; font-size: 20px; }
+.menu-btn span.d { color: var(--muted); font-size: 15px; display: block; }
+.topbar { display: flex; justify-content: space-between; align-items: center; }
+.back { background: none; border: 0; color: var(--muted); font-size: 16px; padding: 6px 0; }
+input[type=text] { font: inherit; width: 100%; padding: 11px 12px; border-radius: 12px; border: 2px solid var(--line); background: var(--bg); color: var(--ink); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 99px; padding: 7px 14px; font-size: 16px; }
+.chip.on { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.scorebar { display: flex; justify-content: space-between; gap: 8px; font-size: 16px; }
+.sb { flex: 1; border-radius: 12px; padding: 8px 10px; border: 2px solid var(--line); text-align: center; background: var(--surface); }
+.sb.turn { border-width: 2px; }
+.sb b { display: block; font-size: 24px; line-height: 1.2; }
+.bigq { font-size: 23px; font-weight: 700; line-height: 1.5; text-align: center; padding: 10px 0; }
+.tag { align-self: center; font-size: 14px; padding: 3px 12px; border-radius: 99px; background: var(--bg); border: 1px solid var(--line); color: var(--muted); }
+.stars { display: flex; justify-content: center; gap: 6px; direction: ltr; }
+.star { background: none; border: 0; font-size: 42px; line-height: 1; padding: 4px; color: var(--line); }
+.star.on { color: #f5b301; }
+.notice { font-size: 14px; color: var(--muted); text-align: center; }
+.big { font-size: 48px; font-weight: 800; line-height: 1.1; color: var(--accent); text-align: center; }
+/* quiz */
+.opts { display: flex; flex-direction: column; gap: 9px; }
+.opt { text-align: right; color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 12px; padding: 11px 14px; }
 .opt:active { border-color: var(--accent); }
 .opt.good { border-color: var(--good); background: var(--good-bg); color: var(--good); font-weight: 700; }
 .opt.bad { border-color: var(--bad); background: var(--bad-bg); color: var(--bad); }
 .opt:disabled { cursor: default; }
-.primary { color: var(--accent-ink); background: var(--accent); border: 0; border-radius: 12px; padding: 14px 18px; font-weight: 700; font-size: 18px; }
-.note { font-size: 16px; color: var(--muted); min-height: 1.7em; }
-.big { font-size: 56px; font-weight: 800; line-height: 1.1; color: var(--accent); }
-.hide { display: none !important; }
+.track { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.fill { height: 100%; background: var(--accent); width: 0; }
+.note { font-size: 16px; color: var(--muted); min-height: 1.6em; }
+/* race */
+#raceWrap { display: flex; flex-direction: column; gap: 8px; min-height: calc(100vh - 32px); }
+.half { flex: 1; border-radius: 16px; padding: 10px; display: flex; flex-direction: column; gap: 6px; border: 2px solid var(--line); background: var(--surface); }
+.half.top { transform: rotate(180deg); }
+.half .hd { display: flex; justify-content: space-between; font-weight: 700; font-size: 16px; }
+.half .ropts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex: 1; }
+.ropt { font-size: 16px; line-height: 1.3; padding: 6px; border-radius: 10px; border: 2px solid var(--line); background: var(--bg); color: var(--ink); }
+.ropt:disabled { opacity: .5; }
+.ropt.good { border-color: var(--good); background: var(--good-bg); color: var(--good); opacity: 1; font-weight: 700; }
+.mid { text-align: center; padding: 6px 4px; }
+.mid .q { font-size: 20px; font-weight: 700; line-height: 1.4; }
+.mid .msg { font-size: 15px; color: var(--muted); min-height: 1.4em; }
+.timer { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; margin-top: 4px; }
+.timer > div { height: 100%; background: var(--accent); width: 100%; }
+/* memory */
+.grid { display: grid; gap: 8px; direction: ltr; }
+.cardm { aspect-ratio: 1 / 1; border-radius: 12px; border: 2px solid var(--line); background: var(--accent); color: transparent; font-size: 30px; display: flex; align-items: center; justify-content: center; padding: 0; }
+.cardm.open { background: var(--surface); color: var(--ink); }
+.cardm.done { background: var(--good-bg); border-color: var(--good); color: var(--ink); }
 </style>
 </head>
 <body>
 <main>
-  <section id="home" class="card">
-    <h1>تحدي المعرفة</h1>
-    <p class="muted">عشرة أسئلة عشوائية من ثقافتك العامة ومعلومات عن الإمارات. جاوب بسرعة وتحدَّ نفسك لتكسر رقمك القياسي.</p>
-    <p id="best" class="muted"></p>
-    <button id="start" class="primary" type="button">ابدأ التحدي</button>
-  </section>
 
-  <section id="game" class="card hide">
-    <div class="bar"><span id="count"></span><span id="score"></span></div>
-    <div class="track"><div id="fill" class="fill"></div></div>
-    <p id="q" class="q"></p>
-    <div id="opts" class="opts"></div>
-    <p id="note" class="note"></p>
-    <button id="next" class="primary hide" type="button">التالي</button>
-  </section>
+<!-- القائمة الرئيسية -->
+<section id="home" class="hide" style="display:flex;flex-direction:column;gap:14px">
+  <div>
+    <h1>ركن الألعاب 🎮</h1>
+    <p class="muted">ثلاث ألعاب في تطبيق واحد. مجانية بالكامل وتعمل بدون إنترنت.</p>
+  </div>
+  <button class="menu-btn" data-go="truthSetup" type="button"><span class="ic">🗣️</span><span><b>لعبة الصراحة</b><span class="d">شخصان على جوال واحد: أسئلة وتحديات ونقاط</span></span></button>
+  <button class="menu-btn" data-go="quizMenu" type="button"><span class="ic">🧠</span><span><b>تحدي المعرفة</b><span class="d">العب وحدك، أو سباق سرعة بين شخصين</span></span></button>
+  <button class="menu-btn" data-go="memMenu" type="button"><span class="ic">🃏</span><span><b>لعبة الذاكرة</b><span class="d">اقلب البطاقات وطابق الأزواج بأقل حركات</span></span></button>
+</section>
 
-  <section id="end" class="card hide">
-    <p class="muted">نتيجتك</p>
-    <p id="final" class="big"></p>
-    <p id="msg"></p>
-    <p id="newbest" class="muted"></p>
-    <button id="again" class="primary" type="button">العب مرة ثانية</button>
-  </section>
+<!-- الصراحة: الإعداد -->
+<section id="truthSetup" class="hide card">
+  <div class="topbar"><button class="back" data-go="home" type="button">‹ القائمة</button></div>
+  <h2>🗣️ لعبة الصراحة</h2>
+  <p class="muted">يسأل التطبيق اللاعب بدوره، ويقيّم اللاعب الآخر الإجابة بالنجوم. التحديات تُنفَّذ أمام الآخر ويحكم عليها.</p>
+  <div class="row">
+    <input id="n1" type="text" maxlength="12" placeholder="اسم اللاعب الأول" value="">
+    <input id="n2" type="text" maxlength="12" placeholder="اسم اللاعب الثاني" value="">
+  </div>
+  <p class="muted">نوع الأسئلة:</p>
+  <div class="chips" id="cats"></div>
+  <p class="muted">عدد الجولات (لكل لاعب):</p>
+  <div class="chips" id="rounds"></div>
+  <button id="truthStart" class="primary" type="button">ابدأ اللعب</button>
+  <p class="notice">للتسلية فقط. اللعبة تعمل بالكامل داخل جوالك ولا تُحفظ الإجابات ولا تُرسل لأحد.</p>
+</section>
+
+<!-- الصراحة: اللعب -->
+<section id="truthPlay" class="hide" style="display:flex;flex-direction:column;gap:12px">
+  <div class="scorebar"><div class="sb" id="s1"></div><div class="sb" id="s2"></div></div>
+  <div class="card">
+    <span class="tag" id="tTag"></span>
+    <p class="muted" style="text-align:center" id="tWho"></p>
+    <p class="bigq" id="tText"></p>
+    <div id="tAct">
+      <button id="tDone" class="primary" type="button" style="width:100%">أجبت، والآن يقيّم الآخر</button>
+      <button id="tSkip" class="ghost" type="button" style="width:100%;margin-top:8px">تخطَّ (بدون نقاط)</button>
+    </div>
+    <div id="tRate" class="hide" style="display:flex;flex-direction:column;gap:10px">
+      <p id="tRateMsg" class="muted" style="text-align:center"></p>
+      <div class="stars" id="stars"></div>
+      <div class="row hide" id="chBtns">
+        <button id="chYes" class="primary" type="button">نجح ✅</button>
+        <button id="chNo" class="ghost" type="button">لم ينجح</button>
+      </div>
+      <button id="tNext" class="primary" type="button" disabled>التالي</button>
+    </div>
+  </div>
+  <button class="back" data-go="home" type="button">إنهاء اللعبة والرجوع للقائمة</button>
+</section>
+
+<!-- الصراحة: النهاية -->
+<section id="truthEnd" class="hide card">
+  <p class="muted" style="text-align:center">النتيجة النهائية</p>
+  <p id="teWin" class="big" style="font-size:30px"></p>
+  <div class="scorebar"><div class="sb" id="e1"></div><div class="sb" id="e2"></div></div>
+  <button id="teAgain" class="primary" type="button">العبوا مرة ثانية</button>
+  <button class="ghost" data-go="home" type="button">القائمة</button>
+</section>
+
+<!-- المعرفة: القائمة -->
+<section id="quizMenu" class="hide card">
+  <div class="topbar"><button class="back" data-go="home" type="button">‹ القائمة</button></div>
+  <h2>🧠 تحدي المعرفة</h2>
+  <p id="best" class="muted"></p>
+  <button id="soloStart" class="primary" type="button">العب وحدك (10 أسئلة)</button>
+  <button id="raceStart" class="ghost" type="button">سباق سرعة: شخصان على نفس الجوال ⚡</button>
+  <p class="muted">في السباق يجلس كل لاعب في جهة من الجوال. أول من يضغط الإجابة الصحيحة يكسب النقاط، والخطأ يخصم نقطة.</p>
+</section>
+
+<!-- المعرفة: فردي -->
+<section id="soloGame" class="hide card">
+  <div class="scorebar" style="color:var(--muted)"><span id="count"></span><span id="score"></span></div>
+  <div class="track"><div id="fill" class="fill"></div></div>
+  <p id="q" class="bigq" style="text-align:right;font-size:22px"></p>
+  <div id="opts" class="opts"></div>
+  <p id="note" class="note"></p>
+  <button id="next" class="primary hide" type="button">التالي</button>
+</section>
+
+<!-- المعرفة: نهاية فردي -->
+<section id="soloEnd" class="hide card">
+  <p class="muted">نتيجتك</p>
+  <p id="final" class="big"></p>
+  <p id="msg" style="text-align:center"></p>
+  <p id="newbest" class="muted" style="text-align:center"></p>
+  <button id="again" class="primary" type="button">العب مرة ثانية</button>
+  <button class="ghost" data-go="quizMenu" type="button">رجوع</button>
+</section>
+
+<!-- المعرفة: سباق -->
+<section id="race" class="hide">
+  <div id="raceWrap">
+    <div class="half top" id="halfTop"></div>
+    <div class="mid card" style="padding:10px">
+      <div class="msg" id="rInfo"></div>
+      <p class="q" id="rQ"></p>
+      <div class="timer"><div id="rTimer"></div></div>
+      <p class="msg" id="rMsg"></p>
+    </div>
+    <div class="half" id="halfBot"></div>
+  </div>
+</section>
+
+<section id="raceEnd" class="hide card">
+  <p class="muted" style="text-align:center">نتيجة السباق</p>
+  <p id="reWin" class="big" style="font-size:30px"></p>
+  <div class="scorebar"><div class="sb" id="re1"></div><div class="sb" id="re2"></div></div>
+  <button id="raceAgain" class="primary" type="button">سباق جديد</button>
+  <button class="ghost" data-go="quizMenu" type="button">رجوع</button>
+</section>
+
+<!-- الذاكرة -->
+<section id="memMenu" class="hide card">
+  <div class="topbar"><button class="back" data-go="home" type="button">‹ القائمة</button></div>
+  <h2>🃏 لعبة الذاكرة</h2>
+  <p class="muted">اقلب بطاقتين في كل مرة وطابق الأزواج المتشابهة بأقل عدد من الحركات.</p>
+  <button class="primary" data-mem="6" type="button">سهل (12 بطاقة) <span id="mb6"></span></button>
+  <button class="primary" data-mem="8" type="button">متوسط (16 بطاقة) <span id="mb8"></span></button>
+  <button class="primary" data-mem="10" type="button">صعب (20 بطاقة) <span id="mb10"></span></button>
+</section>
+
+<section id="memGame" class="hide card">
+  <div class="scorebar" style="color:var(--muted)"><span id="mMoves"></span><span id="mPairs"></span></div>
+  <div id="grid" class="grid"></div>
+  <div id="mEnd" class="hide" style="display:flex;flex-direction:column;gap:8px">
+    <p id="mWin" class="bigq"></p>
+    <button id="mAgain" class="primary" type="button">العب مرة ثانية</button>
+    <button class="ghost" data-go="memMenu" type="button">رجوع</button>
+  </div>
+</section>
+
 </main>
 
 <script>
 (function () {
-  // [question, correct answer, three wrong answers, short explanation]
+  var $ = function (id) { return document.getElementById(id); };
+  var SCREENS = ["home","truthSetup","truthPlay","truthEnd","quizMenu","soloGame","soloEnd","race","raceEnd","memMenu","memGame"];
+  var current = "home";
+  var timers = [];
+  function clearTimers() { timers.forEach(function (t) { clearTimeout(t); clearInterval(t); }); timers = []; }
+  function after(fn, ms) { var t = setTimeout(fn, ms); timers.push(t); return t; }
+
+  function show(id) {
+    clearTimers();
+    current = id;
+    SCREENS.forEach(function (s) {
+      var el = $(s);
+      el.classList.toggle("hide", s !== id);
+    });
+    window.scrollTo(0, 0);
+    if (id === "quizMenu") quizMenu();
+    if (id === "memMenu") memMenu();
+  }
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  function getNum(k) { try { return parseInt(localStorage.getItem(k), 10) || 0; } catch (e) { return 0; } }
+  function setNum(k, n) { try { localStorage.setItem(k, String(n)); } catch (e) {} }
+
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-go]");
+    if (t) show(t.getAttribute("data-go"));
+  });
+  // زر الرجوع في أندرويد
+  window.appBack = function () {
+    if (current === "home") return false;
+    var map = { truthSetup: "home", truthPlay: "home", truthEnd: "home", quizMenu: "home", soloGame: "quizMenu", soloEnd: "quizMenu", race: "quizMenu", raceEnd: "quizMenu", memMenu: "home", memGame: "memMenu" };
+    show(map[current] || "home");
+    return true;
+  };
+
+  /* ================= لعبة الصراحة ================= */
+  var TRUTH = {
+    "خفيفة": [
+      "ما أكثر طعام لا تملّ منه؟",
+      "لو كان عندك يوم إجازة مفتوح، ماذا تفعل فيه؟",
+      "ما أغرب عادة عندك؟",
+      "ما أول تطبيق تفتحه كل صباح؟",
+      "ما الفيلم أو المسلسل الذي تعيد مشاهدته دائماً؟",
+      "ما أجمل مكان زرته في حياتك؟",
+      "لو تستطيع السفر الآن إلى أي بلد، أين تذهب؟",
+      "ما الصفة التي تحبها في نفسك أكثر شيء؟",
+      "ما الهواية التي تتمنى أن تتعلمها؟",
+      "ما أسوأ طبخة جربتها في حياتك؟",
+      "قهوة أم شاي؟ ولماذا؟",
+      "ما الأغنية التي تحفظ كل كلماتها؟"
+    ],
+    "جريئة": [
+      "ما أكثر شيء تندم عليه؟",
+      "ما أكبر كذبة بيضاء قلتها؟",
+      "ما الشيء الذي تخاف أن يعرفه الناس عنك؟",
+      "ما أكثر موقف محرج مرّ عليك؟",
+      "هل سبق أن تظاهرت بأنك لم تسمع شخصاً؟ ولماذا؟",
+      "ما أسوأ هدية استلمتها؟ وماذا فعلت بها؟",
+      "ما الشيء الذي تفعله وأنت وحدك ولا تعترف به؟",
+      "من الشخص الذي تتمنى أن تعتذر له؟",
+      "ما الصفة التي لا تحبها في نفسك؟",
+      "هل غيّرت رأيك في شخص كنت تظنه غير ذلك؟ احكِ القصة.",
+      "ما أكثر شيء تغار منه عند غيرك؟",
+      "ما عادة سيئة تتمنى أن تتخلص منها؟"
+    ],
+    "مضحكة": [
+      "لو كنت حيواناً، أي حيوان تكون؟ ولماذا؟",
+      "لو أصبحت مشهوراً غداً، فبسبب ماذا تتمنى أن تشتهر؟",
+      "ما أغرب حلم رأيته؟",
+      "لو كان اسمك مختلفاً، ماذا تختار؟",
+      "ما أغرب شيء بحثت عنه في الإنترنت؟",
+      "لو أعطوك قدرة خارقة تافهة، ما هي؟",
+      "ما أسخف سبب ضحكت بسببه؟",
+      "لو علقت في جزيرة ومعك شيء واحد، ماذا تحضر؟",
+      "ما أسوأ لقب ناداك به أحد؟",
+      "لو عشت داخل مسلسل كرتون، أي مسلسل تختار؟",
+      "ما أغرب أكلة تحب خلطها مع بعض؟",
+      "ما أكثر شيء تضيّع فيه وقتك؟"
+    ]
+  };
+  var DARES = [
+    "قلّد صوت حيوان لمدة 10 ثوانٍ.",
+    "تكلم 20 ثانية بدون أن تضحك.",
+    "احكِ نكتة، وعلى الآخر أن يحكم عليها.",
+    "ارقص 10 ثوانٍ بدون موسيقى.",
+    "اكتب اسمك بالمقلوب وانطقه.",
+    "مثّل مشهداً بدون كلام والآخر يخمّن.",
+    "قل ثلاث صفات حلوة في اللاعب الآخر.",
+    "غنِّ مقطعاً بصوت مضحك.",
+    "عُدّ من 20 إلى 1 بأسرع ما تقدر.",
+    "تكلم كأنك مذيع نشرة أخبار لمدة 15 ثانية.",
+    "قل بسرعة ثلاث مرات: خيط حرير على حيط خليل.",
+    "قلّد طريقة مشي شخصية كرتونية."
+  ];
+  var tcat = "مختلطة", trounds = 5;
+  var T = null;
+
+  function buildChips(boxId, items, cur, cb) {
+    var box = $(boxId); box.textContent = "";
+    items.forEach(function (it) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "chip" + (String(it) === String(cur) ? " on" : "");
+      b.textContent = it;
+      b.addEventListener("click", function () { cb(it); buildChips(boxId, items, it, cb); });
+      box.appendChild(b);
+    });
+  }
+  buildChips("cats", ["مختلطة", "خفيفة", "جريئة", "مضحكة", "تحديات فقط"], tcat, function (v) { tcat = v; });
+  buildChips("rounds", [3, 5, 8], trounds, function (v) { trounds = v; });
+
+  function scoreBoxes(a, b, turn, idA, idB) {
+    [[a, idA, "var(--p1)", 0], [b, idB, "var(--p2)", 1]].forEach(function (x) {
+      var el = $(x[1]);
+      el.innerHTML = "";
+      var n = document.createElement("span"); n.textContent = x[0].name;
+      var s = document.createElement("b"); s.textContent = x[0].score;
+      el.appendChild(n); el.appendChild(s);
+      el.style.borderColor = (turn === x[3]) ? x[2] : "var(--line)";
+      el.style.color = x[2];
+    });
+  }
+
+  $("truthStart").addEventListener("click", function () {
+    var n1 = $("n1").value.trim() || "اللاعب 1", n2 = $("n2").value.trim() || "اللاعب 2";
+    var pool = [];
+    var keys = Object.keys(TRUTH);
+    keys.forEach(function (k) { if (tcat === "مختلطة" || tcat === k) TRUTH[k].forEach(function (q) { pool.push({ kind: "q", text: q, cat: k }); }); });
+    var dares = DARES.map(function (d) { return { kind: "d", text: d }; });
+    var deck;
+    if (tcat === "تحديات فقط") deck = shuffle(dares);
+    else deck = shuffle(pool.concat(shuffle(dares).slice(0, Math.max(3, Math.round(pool.length / 4)))));
+    T = { p: [{ name: n1, score: 0 }, { name: n2, score: 0 }], turn: 0, n: 0, total: trounds * 2, deck: deck, rated: false };
+    show("truthPlay");
+    tTurn();
+  });
+
+  function tTurn() {
+    var card = T.deck[T.n % T.deck.length];
+    var asker = T.p[1 - T.turn], me = T.p[T.turn];
+    scoreBoxes(T.p[0], T.p[1], T.turn, "s1", "s2");
+    $("tTag").textContent = (card.kind === "d" ? "تحدي" : "سؤال " + card.cat) + " · " + (Math.floor(T.n / 2) + 1) + " من " + (T.total / 2);
+    $("tWho").textContent = "الدور على: " + me.name;
+    $("tText").textContent = card.text;
+    $("tAct").classList.remove("hide");
+    $("tRate").classList.add("hide");
+    $("tDone").textContent = card.kind === "d" ? "نفّذت التحدي" : "أجبت، والآن يقيّم " + asker.name;
+    T.card = card; T.rated = false;
+    $("tNext").disabled = true;
+    $("tNext").textContent = T.n + 1 >= T.total ? "اعرف النتيجة" : "التالي";
+    window.scrollTo(0, 0);
+  }
+  function renderStars(val) {
+    var box = $("stars"); box.textContent = "";
+    for (var i = 1; i <= 5; i++) {
+      (function (i) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "star" + (i <= val ? " on" : ""); b.textContent = "★";
+        b.addEventListener("click", function () {
+          if (T.rated) return;
+          T.rated = true; T.p[T.turn].score += i; renderStars(i);
+          $("tNext").disabled = false; scoreBoxes(T.p[0], T.p[1], T.turn, "s1", "s2");
+        });
+        box.appendChild(b);
+      })(i);
+    }
+  }
+  $("tDone").addEventListener("click", function () {
+    var judge = T.p[1 - T.turn];
+    $("tAct").classList.add("hide");
+    $("tRate").classList.remove("hide");
+    if (T.card.kind === "d") {
+      $("stars").classList.add("hide"); $("chBtns").classList.remove("hide");
+      $("tRateMsg").textContent = judge.name + "، هل نجح التحدي؟";
+    } else {
+      $("stars").classList.remove("hide"); $("chBtns").classList.add("hide");
+      $("tRateMsg").textContent = judge.name + "، كم تعطي صراحة الإجابة وجمالها؟";
+      renderStars(0);
+    }
+  });
+  $("tSkip").addEventListener("click", function () { T.rated = true; tAdvance(); });
+  $("chYes").addEventListener("click", function () {
+    if (T.rated) return; T.rated = true; T.p[T.turn].score += 3;
+    scoreBoxes(T.p[0], T.p[1], T.turn, "s1", "s2"); $("tNext").disabled = false;
+  });
+  $("chNo").addEventListener("click", function () { if (T.rated) return; T.rated = true; $("tNext").disabled = false; });
+  $("tNext").addEventListener("click", tAdvance);
+  function tAdvance() {
+    T.n++; T.turn = 1 - T.turn;
+    if (T.n >= T.total) { tEnd(); return; }
+    tTurn();
+  }
+  function tEnd() {
+    scoreBoxes(T.p[0], T.p[1], -1, "e1", "e2");
+    var a = T.p[0], b = T.p[1];
+    $("teWin").textContent = a.score === b.score ? "تعادل! 🤝" : "الفائز: " + (a.score > b.score ? a.name : b.name) + " 🏆";
+    show("truthEnd");
+  }
+  $("teAgain").addEventListener("click", function () { show("truthSetup"); });
+
+  /* ================= تحدي المعرفة ================= */
+  // [سؤال، الصحيح، [3 خاطئة]، شرح]
   var BANK = [
     ["ما عاصمة دولة الإمارات العربية المتحدة؟", "أبوظبي", ["دبي", "الشارقة", "العين"], "أبوظبي هي العاصمة الاتحادية."],
     ["كم عدد الإمارات المكوِّنة لدولة الإمارات؟", "سبع", ["ست", "خمس", "ثمان"], "أبوظبي ودبي والشارقة وعجمان وأم القيوين ورأس الخيمة والفجيرة."],
@@ -91,100 +441,228 @@ button { font: inherit; cursor: pointer; }
     ["ما العملة الرسمية في الإمارات؟", "الدرهم", ["الريال", "الدينار", "الجنيه"], ""],
     ["أي لون من الألوان التالية ليس في علم الإمارات؟", "الأزرق", ["الأحمر", "الأخضر", "الأسود"], "ألوان العلم: الأحمر والأخضر والأبيض والأسود."],
     ["في أي إمارة يوجد برج خليفة؟", "دبي", ["أبوظبي", "عجمان", "الفجيرة"], ""],
+    ["ما أكبر إمارة في الإمارات من حيث المساحة؟", "أبوظبي", ["دبي", "الشارقة", "رأس الخيمة"], ""],
+    ["ما أصغر إمارة من حيث المساحة؟", "عجمان", ["الفجيرة", "أم القيوين", "الشارقة"], ""],
+    ["في أي إمارة يقع جبل جيس، أعلى قمة في الإمارات؟", "رأس الخيمة", ["الفجيرة", "العين", "دبي"], ""],
+    ["أي إمارة تقع على ساحل خليج عُمان الشرقي؟", "الفجيرة", ["عجمان", "أم القيوين", "أبوظبي"], ""],
+    ["ما الطائر الوطني لدولة الإمارات؟", "الصقر", ["النسر", "الحمام", "الببغاء"], ""],
+    ["متى يحتفل الإماراتيون باليوم الوطني؟", "2 ديسمبر", ["1 يناير", "2 نوفمبر", "15 أغسطس"], ""],
     ["ما أكبر كواكب المجموعة الشمسية؟", "المشتري", ["زحل", "الأرض", "نبتون"], ""],
     ["أي كوكب يُعرف بالكوكب الأحمر؟", "المريخ", ["الزهرة", "عطارد", "أورانوس"], ""],
+    ["كم عدد كواكب المجموعة الشمسية؟", "8", ["7", "9", "10"], ""],
+    ["ما أقرب نجم إلى الأرض؟", "الشمس", ["القمر", "الشعرى", "المريخ"], ""],
     ["ما أكبر محيطات العالم؟", "الهادئ", ["الأطلسي", "الهندي", "المتجمد الشمالي"], ""],
     ["ما الرمز الكيميائي للذهب؟", "Au", ["Ag", "Fe", "Go"], "Au من الكلمة اللاتينية aurum."],
+    ["ما الصيغة الكيميائية للماء؟", "H2O", ["CO2", "O2", "NaCl"], ""],
+    ["كم تبلغ درجة غليان الماء بالدرجات المئوية عند مستوى سطح البحر؟", "100", ["90", "80", "120"], ""],
+    ["ما أكبر عضو في جسم الإنسان؟", "الجلد", ["الكبد", "القلب", "الرئتان"], ""],
+    ["كم عدد حجرات القلب البشري؟", "4", ["2", "3", "6"], ""],
+    ["كم عدد عظام جسم الإنسان البالغ تقريباً؟", "206", ["106", "306", "406"], ""],
+    ["ما أكبر حيوان في العالم؟", "الحوت الأزرق", ["الفيل", "القرش الأبيض", "الزرافة"], ""],
+    ["ما أسرع حيوان بري؟", "الفهد", ["الأسد", "الحصان", "النمر"], ""],
+    ["ما الغاز الذي يحتاجه الإنسان ليتنفس؟", "الأكسجين", ["النيتروجين", "ثاني أكسيد الكربون", "الهيليوم"], ""],
     ["ما عاصمة مصر؟", "القاهرة", ["الإسكندرية", "الجيزة", "أسوان"], ""],
     ["ما عاصمة المملكة العربية السعودية؟", "الرياض", ["جدة", "مكة المكرمة", "الدمام"], ""],
+    ["ما عاصمة الأردن؟", "عمّان", ["إربد", "العقبة", "الزرقاء"], ""],
+    ["ما عاصمة المغرب؟", "الرباط", ["الدار البيضاء", "مراكش", "فاس"], ""],
+    ["ما عاصمة سلطنة عُمان؟", "مسقط", ["صلالة", "صحار", "نزوى"], ""],
+    ["ما عاصمة دولة قطر؟", "الدوحة", ["الوكرة", "الخور", "الريان"], ""],
+    ["ما عاصمة اليابان؟", "طوكيو", ["كيوتو", "أوساكا", "سابورو"], ""],
+    ["ما عاصمة فرنسا؟", "باريس", ["ليون", "مرسيليا", "نيس"], ""],
+    ["ما عاصمة تركيا؟", "أنقرة", ["إسطنبول", "إزمير", "أنطاليا"], ""],
     ["ما أكبر دولة عربية من حيث المساحة؟", "الجزائر", ["السعودية", "السودان", "مصر"], ""],
+    ["ما أكبر دولة في العالم من حيث المساحة؟", "روسيا", ["الصين", "كندا", "أمريكا"], ""],
     ["ما أكبر صحراء حارة في العالم؟", "الصحراء الكبرى", ["صحراء الربع الخالي", "صحراء غوبي", "صحراء كالاهاري"], ""],
+    ["ما أعلى قمة جبلية في العالم؟", "إيفرست", ["كي تو", "مون بلان", "كلمنجارو"], ""],
+    ["في أي دولة تقع أهرامات الجيزة؟", "مصر", ["السودان", "المكسيك", "العراق"], ""],
+    ["كم عدد قارات العالم؟", "7", ["5", "6", "8"], ""],
     ["كم عدد حروف اللغة العربية؟", "28", ["26", "30", "32"], ""],
-    ["ما أسرع حيوان بري؟", "الفهد", ["الأسد", "الحصان", "النمر"], ""],
     ["كم عدد أيام السنة الكبيسة؟", "366", ["365", "364", "367"], ""],
-    ["ما الغاز الذي يحتاجه الإنسان ليتنفس؟", "الأكسجين", ["النيتروجين", "ثاني أكسيد الكربون", "الهيليوم"], ""],
-    ["كم عدد ألوان قوس قزح؟", "سبعة", ["خمسة", "ستة", "ثمانية"], ""]
+    ["كم عدد ألوان قوس قزح؟", "سبعة", ["خمسة", "ستة", "ثمانية"], ""],
+    ["كم دقيقة في الساعة الواحدة؟", "60", ["50", "100", "30"], ""]
   ];
-  var ROUND = 10;
-  var $ = function (id) { return document.getElementById(id); };
-  var state = { list: [], i: 0, score: 0, locked: false };
+  var ROUND = 10, solo = { list: [], i: 0, score: 0, locked: false };
 
-  function shuffle(a) {
-    a = a.slice();
-    for (var i = a.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var t = a[i]; a[i] = a[j]; a[j] = t;
-    }
-    return a;
+  function quizMenu() {
+    var b = getNum("quiz-best");
+    $("best").textContent = b ? "رقمك القياسي في اللعب الفردي: " + b + " من " + ROUND : "لم تلعب بعد. هل تكسب من أول مرة؟";
   }
-  function getBest() { try { return parseInt(localStorage.getItem("quiz-best"), 10) || 0; } catch (e) { return 0; } }
-  function setBest(n) { try { localStorage.setItem("quiz-best", String(n)); } catch (e) {} }
-  function show(id) { ["home", "game", "end"].forEach(function (s) { $(s).classList.toggle("hide", s !== id); }); window.scrollTo(0, 0); }
-
-  function home() {
-    var b = getBest();
-    $("best").textContent = b ? "رقمك القياسي: " + b + " من " + ROUND : "لم تلعب بعد. هل تكسب من أول مرة؟";
-    show("home");
+  $("soloStart").addEventListener("click", soloStart);
+  $("again").addEventListener("click", soloStart);
+  function soloStart() {
+    solo.list = shuffle(BANK).slice(0, ROUND); solo.i = 0; solo.score = 0;
+    show("soloGame"); soloRender();
   }
-
-  function start() {
-    state.list = shuffle(BANK).slice(0, ROUND);
-    state.i = 0; state.score = 0;
-    show("game");
-    render();
-  }
-
-  function render() {
-    var item = state.list[state.i];
-    state.locked = false;
-    $("count").textContent = "السؤال " + (state.i + 1) + " من " + ROUND;
-    $("score").textContent = "النقاط: " + state.score;
-    $("fill").style.width = (state.i / ROUND * 100) + "%";
-    $("q").textContent = item[0];
-    $("note").textContent = "";
-    $("next").classList.add("hide");
-    var box = $("opts");
-    box.textContent = "";
+  function soloRender() {
+    var item = solo.list[solo.i]; solo.locked = false;
+    $("count").textContent = "السؤال " + (solo.i + 1) + " من " + ROUND;
+    $("score").textContent = "النقاط: " + solo.score;
+    $("fill").style.width = (solo.i / ROUND * 100) + "%";
+    $("q").textContent = item[0]; $("note").textContent = ""; $("next").classList.add("hide");
+    var box = $("opts"); box.textContent = "";
     shuffle([item[1]].concat(item[2])).forEach(function (text) {
       var b = document.createElement("button");
       b.type = "button"; b.className = "opt"; b.textContent = text;
-      b.addEventListener("click", function () { answer(b, text === item[1]); });
+      b.addEventListener("click", function () { soloAnswer(b, text === item[1]); });
       box.appendChild(b);
     });
   }
-
-  function answer(btn, ok) {
-    if (state.locked) return;
-    state.locked = true;
-    var item = state.list[state.i];
-    Array.prototype.forEach.call($("opts").children, function (b) {
-      b.disabled = true;
-      if (b.textContent === item[1]) b.classList.add("good");
-    });
-    if (ok) { state.score++; $("note").textContent = "إجابة صحيحة! " + item[3]; }
+  function soloAnswer(btn, ok) {
+    if (solo.locked) return; solo.locked = true;
+    var item = solo.list[solo.i];
+    Array.prototype.forEach.call($("opts").children, function (b) { b.disabled = true; if (b.textContent === item[1]) b.classList.add("good"); });
+    if (ok) { solo.score++; $("note").textContent = "إجابة صحيحة! " + item[3]; }
     else { btn.classList.add("bad"); $("note").textContent = "الجواب الصحيح: " + item[1] + ". " + item[3]; }
-    $("score").textContent = "النقاط: " + state.score;
-    $("next").textContent = state.i === ROUND - 1 ? "اعرف النتيجة" : "التالي";
+    $("score").textContent = "النقاط: " + solo.score;
+    $("next").textContent = solo.i === ROUND - 1 ? "اعرف النتيجة" : "التالي";
     $("next").classList.remove("hide");
   }
-
-  function next() {
-    if (state.i < ROUND - 1) { state.i++; render(); } else { finish(); }
-  }
-
-  function finish() {
-    var s = state.score, best = getBest();
+  $("next").addEventListener("click", function () {
+    if (solo.i < ROUND - 1) { solo.i++; soloRender(); } else { soloFinish(); }
+  });
+  function soloFinish() {
+    var s = solo.score, best = getNum("quiz-best");
     $("final").textContent = s + " / " + ROUND;
     $("msg").textContent = s === ROUND ? "ممتاز! علامة كاملة." : s >= 7 ? "أحسنت! معلوماتك قوية." : s >= 4 ? "جيد، جرّب مرة ثانية لتتحسن." : "لا بأس، التحدي القادم أسهل!";
-    if (s > best) { setBest(s); $("newbest").textContent = "رقم قياسي جديد!"; }
+    if (s > best) { setNum("quiz-best", s); $("newbest").textContent = "رقم قياسي جديد!"; }
     else { $("newbest").textContent = "رقمك القياسي: " + best + " من " + ROUND; }
-    show("end");
+    show("soloEnd");
   }
 
-  $("start").addEventListener("click", start);
-  $("next").addEventListener("click", next);
-  $("again").addEventListener("click", start);
-  home();
+  /* ============ سباق السرعة (شخصان) ============ */
+  var RACE_Q = 8, RACE_MS = 10000;
+  var R = null;
+  $("raceStart").addEventListener("click", raceStart);
+  $("raceAgain").addEventListener("click", raceStart);
+
+  function raceStart() {
+    R = { list: shuffle(BANK).slice(0, RACE_Q), i: 0, sc: [0, 0], locked: [false, false], live: false, t0: 0 };
+    show("race");
+    buildHalf("halfBot", 0, "اللاعب 1"); buildHalf("halfTop", 1, "اللاعب 2");
+    raceQ();
+  }
+  function buildHalf(id, p, name) {
+    var h = $(id); h.textContent = "";
+    h.style.borderColor = p === 0 ? "var(--p1)" : "var(--p2)";
+    var hd = document.createElement("div"); hd.className = "hd"; hd.style.color = p === 0 ? "var(--p1)" : "var(--p2)";
+    var a = document.createElement("span"); a.textContent = name;
+    var b = document.createElement("span"); b.id = "rs" + p; b.textContent = "0";
+    hd.appendChild(a); hd.appendChild(b);
+    var o = document.createElement("div"); o.className = "ropts"; o.id = "ro" + p;
+    h.appendChild(hd); h.appendChild(o);
+  }
+  function raceQ() {
+    var item = R.list[R.i];
+    R.locked = [false, false]; R.live = true; R.order = shuffle([item[1]].concat(item[2]));
+    $("rInfo").textContent = "السؤال " + (R.i + 1) + " من " + RACE_Q + " · الأسرع في الصحيح يكسب 2، والخطأ يخصم 1";
+    $("rQ").textContent = item[0]; $("rMsg").textContent = "";
+    [0, 1].forEach(function (p) {
+      $("rs" + p).textContent = R.sc[p];
+      var box = $("ro" + p); box.textContent = "";
+      R.order.forEach(function (text) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "ropt"; b.textContent = text;
+        b.addEventListener("click", function () { racePick(p, text, b); });
+        box.appendChild(b);
+      });
+    });
+    var bar = $("rTimer"); bar.style.transition = "none"; bar.style.width = "100%";
+    void bar.offsetWidth;
+    bar.style.transition = "width " + RACE_MS + "ms linear"; bar.style.width = "0%";
+    after(function () { if (R.live) raceEndQ(-1); }, RACE_MS);
+  }
+  function racePick(p, text, btn) {
+    if (!R.live || R.locked[p]) return;
+    var item = R.list[R.i];
+    if (text === item[1]) {
+      R.sc[p] += 2; raceEndQ(p);
+    } else {
+      R.sc[p] -= 1; R.locked[p] = true;
+      Array.prototype.forEach.call($("ro" + p).children, function (b) { b.disabled = true; });
+      $("rs" + p).textContent = R.sc[p];
+      $("rMsg").textContent = "اللاعب " + (p + 1) + " أخطأ (-1)";
+      if (R.locked[0] && R.locked[1]) raceEndQ(-2);
+    }
+  }
+  function raceEndQ(winner) {
+    R.live = false; clearTimers();
+    var item = R.list[R.i];
+    [0, 1].forEach(function (p) {
+      $("rs" + p).textContent = R.sc[p];
+      Array.prototype.forEach.call($("ro" + p).children, function (b) { b.disabled = true; if (b.textContent === item[1]) b.classList.add("good"); });
+    });
+    $("rMsg").textContent = winner >= 0 ? "أسرع إجابة صحيحة: اللاعب " + (winner + 1) + " (+2)" : (winner === -1 ? "انتهى الوقت! الجواب: " : "أخطأ الاثنان! الجواب: ") + item[1];
+    after(function () {
+      if (R.i < RACE_Q - 1) { R.i++; raceQ(); } else { raceFinish(); }
+    }, 2200);
+  }
+  function raceFinish() {
+    var a = R.sc[0], b = R.sc[1];
+    $("reWin").textContent = a === b ? "تعادل! 🤝" : "الفائز: اللاعب " + (a > b ? 1 : 2) + " 🏆";
+    [[0, "re1", "var(--p1)"], [1, "re2", "var(--p2)"]].forEach(function (x) {
+      var el = $(x[1]); el.textContent = "";
+      var n = document.createElement("span"); n.textContent = "اللاعب " + (x[0] + 1);
+      var s = document.createElement("b"); s.textContent = R.sc[x[0]];
+      el.appendChild(n); el.appendChild(s); el.style.borderColor = x[2]; el.style.color = x[2];
+    });
+    show("raceEnd");
+  }
+
+  /* ================= لعبة الذاكرة ================= */
+  var EMOJIS = ["🐪","🦅","🌴","🕌","🚀","⚽","🎮","🍉","🍕","🌙","⭐","🔥","🐟","🎧","🚗","📚"];
+  var M = null;
+  function memMenu() {
+    [6, 8, 10].forEach(function (n) {
+      var b = getNum("mem-best-" + n);
+      $("mb" + n).textContent = b ? "· أفضل: " + b + " حركة" : "";
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-mem]"), function (el) {
+    el.addEventListener("click", function () { memStart(parseInt(el.getAttribute("data-mem"), 10)); });
+  });
+  $("mAgain").addEventListener("click", function () { memStart(M.pairs); });
+  function memStart(pairs) {
+    var picks = shuffle(EMOJIS).slice(0, pairs);
+    var cards = shuffle(picks.concat(picks));
+    M = { pairs: pairs, cards: cards, open: [], found: 0, moves: 0, busy: false };
+    var cols = pairs === 6 ? 3 : 4;
+    var g = $("grid"); g.textContent = ""; g.style.gridTemplateColumns = "repeat(" + cols + ", 1fr)";
+    cards.forEach(function (e, idx) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "cardm"; b.textContent = e; b.setAttribute("aria-label", "بطاقة");
+      b.addEventListener("click", function () { memFlip(idx, b); });
+      g.appendChild(b);
+    });
+    $("mEnd").classList.add("hide");
+    memHud(); show("memGame");
+  }
+  function memHud() {
+    $("mMoves").textContent = "الحركات: " + M.moves;
+    $("mPairs").textContent = "الأزواج: " + M.found + " / " + M.pairs;
+  }
+  function memFlip(idx, btn) {
+    if (M.busy || btn.classList.contains("open") || btn.classList.contains("done")) return;
+    btn.classList.add("open"); M.open.push({ idx: idx, btn: btn });
+    if (M.open.length < 2) return;
+    M.moves++; M.busy = true;
+    var a = M.open[0], b = M.open[1];
+    if (M.cards[a.idx] === M.cards[b.idx]) {
+      a.btn.className = "cardm done"; b.btn.className = "cardm done";
+      M.found++; M.open = []; M.busy = false; memHud();
+      if (M.found === M.pairs) memWin();
+    } else {
+      memHud();
+      after(function () { a.btn.classList.remove("open"); b.btn.classList.remove("open"); M.open = []; M.busy = false; }, 800);
+    }
+  }
+  function memWin() {
+    var key = "mem-best-" + M.pairs, best = getNum(key), t = "أنهيتها في " + M.moves + " حركة. ";
+    if (!best || M.moves < best) { setNum(key, M.moves); t += "رقم قياسي جديد! 🎉"; } else { t += "أفضل رقم عندك: " + best + "."; }
+    $("mWin").textContent = t; $("mEnd").classList.remove("hide");
+  }
+
+  show("home");
+  $("home").style.display = "flex";
 })();
 </script>
 </body>

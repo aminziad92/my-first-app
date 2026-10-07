@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تحدي المعرفة</title>
+<style>
+:root {
+  --bg: #f3f6f6;
+  --surface: #ffffff;
+  --ink: #14262b;
+  --muted: #587076;
+  --line: #d5e0e1;
+  --accent: #0b7f7b;
+  --accent-ink: #ffffff;
+  --good: #1b7f3a;
+  --good-bg: #e0f3e6;
+  --bad: #b3261e;
+  --bad-bg: #fbe4e2;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", "Noto Naskh Arabic", Tahoma, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1a1c; --surface: #172a2d; --ink: #e7f1f1; --muted: #9db6b9; --line: #2a4448;
+    --accent: #4fd6cf; --accent-ink: #0f1a1c;
+    --good: #7be39a; --good-bg: #17402a; --bad: #ff9a92; --bad-bg: #4a1f1c;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 18px; line-height: 1.7; padding: 20px 16px 32px; }
+main { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+h1 { font-size: 34px; line-height: 1.2; margin: 0; }
+p { margin: 0; }
+.muted { color: var(--muted); font-size: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.bar { display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: var(--muted); }
+.track { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.fill { height: 100%; background: var(--accent); width: 0; transition: width .25s; }
+.q { font-size: 22px; font-weight: 700; line-height: 1.5; }
+.opts { display: flex; flex-direction: column; gap: 10px; }
+button { font: inherit; cursor: pointer; }
+.opt { text-align: right; color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.opt:active { border-color: var(--accent); }
+.opt.good { border-color: var(--good); background: var(--good-bg); color: var(--good); font-weight: 700; }
+.opt.bad { border-color: var(--bad); background: var(--bad-bg); color: var(--bad); }
+.opt:disabled { cursor: default; }
+.primary { color: var(--accent-ink); background: var(--accent); border: 0; border-radius: 12px; padding: 14px 18px; font-weight: 700; font-size: 18px; }
+.note { font-size: 16px; color: var(--muted); min-height: 1.7em; }
+.big { font-size: 56px; font-weight: 800; line-height: 1.1; color: var(--accent); }
+.hide { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <section id="home" class="card">
+    <h1>تحدي المعرفة</h1>
+    <p class="muted">عشرة أسئلة عشوائية من ثقافتك العامة ومعلومات عن الإمارات. جاوب بسرعة وتحدَّ نفسك لتكسر رقمك القياسي.</p>
+    <p id="best" class="muted"></p>
+    <button id="start" class="primary" type="button">ابدأ التحدي</button>
+  </section>
+
+  <section id="game" class="card hide">
+    <div class="bar"><span id="count"></span><span id="score"></span></div>
+    <div class="track"><div id="fill" class="fill"></div></div>
+    <p id="q" class="q"></p>
+    <div id="opts" class="opts"></div>
+    <p id="note" class="note"></p>
+    <button id="next" class="primary hide" type="button">التالي</button>
+  </section>
+
+  <section id="end" class="card hide">
+    <p class="muted">نتيجتك</p>
+    <p id="final" class="big"></p>
+    <p id="msg"></p>
+    <p id="newbest" class="muted"></p>
+    <button id="again" class="primary" type="button">العب مرة ثانية</button>
+  </section>
+</main>
+
+<script>
+(function () {
+  // [question, correct answer, three wrong answers, short explanation]
+  var BANK = [
+    ["ما عاصمة دولة الإمارات العربية المتحدة؟", "أبوظبي", ["دبي", "الشارقة", "العين"], "أبوظبي هي العاصمة الاتحادية."],
+    ["كم عدد الإمارات المكوِّنة لدولة الإمارات؟", "سبع", ["ست", "خمس", "ثمان"], "أبوظبي ودبي والشارقة وعجمان وأم القيوين ورأس الخيمة والفجيرة."],
+    ["ما أطول برج في العالم؟", "برج خليفة", ["برج العرب", "برج إيفل", "برج القاهرة"], "ارتفاعه 828 متراً ويقع في دبي."],
+    ["في أي مدينة يقع مسجد الشيخ زايد الكبير؟", "أبوظبي", ["دبي", "الشارقة", "رأس الخيمة"], ""],
+    ["من هو مؤسس دولة الإمارات العربية المتحدة؟", "الشيخ زايد بن سلطان آل نهيان", ["الشيخ راشد بن سعيد آل مكتوم", "الشيخ صقر القاسمي", "الشيخ خليفة بن زايد"], "رحمه الله."],
+    ["في أي عام قام اتحاد دولة الإمارات؟", "1971", ["1961", "1981", "1991"], "قام الاتحاد في الثاني من ديسمبر 1971."],
+    ["ما العملة الرسمية في الإمارات؟", "الدرهم", ["الريال", "الدينار", "الجنيه"], ""],
+    ["أي لون من الألوان التالية ليس في علم الإمارات؟", "الأزرق", ["الأحمر", "الأخضر", "الأسود"], "ألوان العلم: الأحمر والأخضر والأبيض والأسود."],
+    ["في أي إمارة يوجد برج خليفة؟", "دبي", ["أبوظبي", "عجمان", "الفجيرة"], ""],
+    ["ما أكبر كواكب المجموعة الشمسية؟", "المشتري", ["زحل", "الأرض", "نبتون"], ""],
+    ["أي كوكب يُعرف بالكوكب الأحمر؟", "المريخ", ["الزهرة", "عطارد", "أورانوس"], ""],
+    ["ما أكبر محيطات العالم؟", "الهادئ", ["الأطلسي", "الهندي", "المتجمد الشمالي"], ""],
+    ["ما الرمز الكيميائي للذهب؟", "Au", ["Ag", "Fe", "Go"], "Au من الكلمة اللاتينية aurum."],
+    ["ما عاصمة مصر؟", "القاهرة", ["الإسكندرية", "الجيزة", "أسوان"], ""],
+    ["ما عاصمة المملكة العربية السعودية؟", "الرياض", ["جدة", "مكة المكرمة", "الدمام"], ""],
+    ["ما أكبر دولة عربية من حيث المساحة؟", "الجزائر", ["السعودية", "السودان", "مصر"], ""],
+    ["ما أكبر صحراء حارة في العالم؟", "الصحراء الكبرى", ["صحراء الربع الخالي", "صحراء غوبي", "صحراء كالاهاري"], ""],
+    ["كم عدد حروف اللغة العربية؟", "28", ["26", "30", "32"], ""],
+    ["ما أسرع حيوان بري؟", "الفهد", ["الأسد", "الحصان", "النمر"], ""],
+    ["كم عدد أيام السنة الكبيسة؟", "366", ["365", "364", "367"], ""],
+    ["ما الغاز الذي يحتاجه الإنسان ليتنفس؟", "الأكسجين", ["النيتروجين", "ثاني أكسيد الكربون", "الهيليوم"], ""],
+    ["كم عدد ألوان قوس قزح؟", "سبعة", ["خمسة", "ستة", "ثمانية"], ""]
+  ];
+  var ROUND = 10;
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { list: [], i: 0, score: 0, locked: false };
+
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function getBest() { try { return parseInt(localStorage.getItem("quiz-best"), 10) || 0; } catch (e) { return 0; } }
+  function setBest(n) { try { localStorage.setItem("quiz-best", String(n)); } catch (e) {} }
+  function show(id) { ["home", "game", "end"].forEach(function (s) { $(s).classList.toggle("hide", s !== id); }); window.scrollTo(0, 0); }
+
+  function home() {
+    var b = getBest();
+    $("best").textContent = b ? "رقمك القياسي: " + b + " من " + ROUND : "لم تلعب بعد. هل تكسب من أول مرة؟";
+    show("home");
+  }
+
+  function start() {
+    state.list = shuffle(BANK).slice(0, ROUND);
+    state.i = 0; state.score = 0;
+    show("game");
+    render();
+  }
+
+  function render() {
+    var item = state.list[state.i];
+    state.locked = false;
+    $("count").textContent = "السؤال " + (state.i + 1) + " من " + ROUND;
+    $("score").textContent = "النقاط: " + state.score;
+    $("fill").style.width = (state.i / ROUND * 100) + "%";
+    $("q").textContent = item[0];
+    $("note").textContent = "";
+    $("next").classList.add("hide");
+    var box = $("opts");
+    box.textContent = "";
+    shuffle([item[1]].concat(item[2])).forEach(function (text) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "opt"; b.textContent = text;
+      b.addEventListener("click", function () { answer(b, text === item[1]); });
+      box.appendChild(b);
+    });
+  }
+
+  function answer(btn, ok) {
+    if (state.locked) return;
+    state.locked = true;
+    var item = state.list[state.i];
+    Array.prototype.forEach.call($("opts").children, function (b) {
+      b.disabled = true;
+      if (b.textContent === item[1]) b.classList.add("good");
+    });
+    if (ok) { state.score++; $("note").textContent = "إجابة صحيحة! " + item[3]; }
+    else { btn.classList.add("bad"); $("note").textContent = "الجواب الصحيح: " + item[1] + ". " + item[3]; }
+    $("score").textContent = "النقاط: " + state.score;
+    $("next").textContent = state.i === ROUND - 1 ? "اعرف النتيجة" : "التالي";
+    $("next").classList.remove("hide");
+  }
+
+  function next() {
+    if (state.i < ROUND - 1) { state.i++; render(); } else { finish(); }
+  }
+
+  function finish() {
+    var s = state.score, best = getBest();
+    $("final").textContent = s + " / " + ROUND;
+    $("msg").textContent = s === ROUND ? "ممتاز! علامة كاملة." : s >= 7 ? "أحسنت! معلوماتك قوية." : s >= 4 ? "جيد، جرّب مرة ثانية لتتحسن." : "لا بأس، التحدي القادم أسهل!";
+    if (s > best) { setBest(s); $("newbest").textContent = "رقم قياسي جديد!"; }
+    else { $("newbest").textContent = "رقمك القياسي: " + best + " من " + ROUND; }
+    show("end");
+  }
+
+  $("start").addEventListener("click", start);
+  $("next").addEventListener("click", next);
+  $("again").addEventListener("click", start);
+  home();
+})();
+</script>
+</body>
+</html>
